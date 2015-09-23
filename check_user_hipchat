@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+#
+#
+
+import hipchat
+import sys
+import os
+
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option("-t", "--hipchat-token", dest="token")
+parser.add_option("-u", "--user", dest="user")
+
+(options, args) = parser.parse_args()
+
+if not options.user:
+    print 'ERROR no user name provided'
+    sys.exit(3)
+
+hipchat_token = os.getenv('HIPCHAT_TOKEN', None)
+if hipchat_token == None and options.token:
+	hipchat_token = options.token
+else:
+	print 'ERROR no hipchat api token provided'
+	sys.exit(3)
+
+hipster = hipchat.HipChat(token=hipchat_token)
+user_data = hipster.list_users()
+
+for user in user_data['users']:
+    if user['name'] == options.user:
+        if user['status'] == 'available':
+            print 'OK User {} online'.format(options.user)
+            sys.exit(0)
+        else:  # status offline
+            print 'CRITICAL User {} not online'.format(options.user)
+            sys.exit(2)
+
+print 'WARNING User {} unknow'.format(options.user)
+sys.exit(1)
