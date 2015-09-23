@@ -21,7 +21,8 @@ if not options.user:
 hipchat_token = os.getenv('HIPCHAT_TOKEN', None)
 if hipchat_token == None and options.token:
     hipchat_token = options.token
-else:
+
+if hipchat_token == None:
     print 'ERROR no hipchat api token provided'
     sys.exit(3)
 
